@@ -1,0 +1,38 @@
+{
+  "name": "qvto",
+  "displayName": "QVTo",
+  "description": "QVTo syntax hightlighting",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/qvtorg/qvto-vscode"
+  },
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.97.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "qvto",
+        "aliases": [
+          "QVTo",
+          "qvto"
+        ],
+        "extensions": [
+          ".qvto"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "qvto",
+        "scopeName": "source.qvto",
+        "path": "./syntaxes/qvto.tmLanguage.json"
+      }
+    ]
+  }
+}

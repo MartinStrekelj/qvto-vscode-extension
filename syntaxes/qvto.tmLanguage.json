@@ -1,0 +1,58 @@
+{
+  "name": "QVTo",
+  "scopeName": "source.qvto",
+  "fileTypes": ["qvto"],
+  "patterns": [
+    {
+      "name": "comment.line.double-slash.qvto",
+      "match": "//.*$"
+    },
+    {
+      "name": "comment.block.qvto",
+      "begin": "/\\*",
+      "end": "\\*/"
+    },
+    {
+      "name": "string.quoted.double.qvto",
+      "begin": "\"",
+      "end": "\"",
+      "patterns": [
+        {
+          "name": "constant.character.escape.qvto",
+          "match": "\\\\."
+        }
+      ]
+    },
+    {
+      "name": "string.quoted.single.qvto",
+      "begin": "'",
+      "end": "'",
+      "patterns": [
+        {
+          "name": "constant.character.escape.qvto",
+          "match": "\\\\."
+        }
+      ]
+    },
+    {
+      "name": "keyword.control.qvto",
+      "match": "\\b(transformation|query|mapping|helper|modeltype|in|out|inout|when|where|init|end|object|return|var|let|if|then|else|endif|while|with|collect|select|reject|exists|forAll|forEach|import|library|extends|disjuncts|merges|inherits|late|main)\\b"
+    },
+    {
+      "name": "constant.numeric.qvto",
+      "match": "\\b([0-9]+)\\b"
+    },
+    {
+      "name": "constant.language.qvto",
+      "match": "\\b(true|false|null)\\b"
+    },
+    {
+      "name": "storage.type.qvto",
+      "match": "\\b(Boolean|Integer|Real|String|Set|Sequence|Bag|OrderedSet|Dict|Tuple|List|Map)\\b"
+    },
+    {
+      "name": "entity.name.function.qvto",
+      "match": "\\b(mapping|helper|query)\\s+([a-zA-Z_][a-zA-Z0-9_]*)(\\s*::\\s*[a-zA-Z_][a-zA-Z0-9_]*)?\\s*\\("
+    }
+  ]
+}
