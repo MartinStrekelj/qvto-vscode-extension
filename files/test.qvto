@@ -1,0 +1,126 @@
+modeltype PIM uses "http://www.example.org/cicd_pim";
+modeltype UML "strict" uses uml('http://www.eclipse.org/uml2/5.0.0/UML');
+
+transformation uml2pim(
+  in umlDiagram: UML, 
+  out pimModel: PIM
+);
+
+main() {
+    log('Starting to print CICD UML model information');
+    umlDiagram.objects()[Activity]->map activity2Pipeline();
+    log('Finished printing CICD UML model information');
+}
+
+mapping Activity::activity2Pipeline(): PIM::Pipeline {
+	name := self.name;
+	
+	// Map structured nodes to stages
+    stages += self.node[StructuredActivityNode]->map structuredNode2Stage();
+    
+    // Map all actions to jobs
+    jobs += self.allSubobjectsOfType(OpaqueAction)->map action2Job();
+    
+    // Set job-stage relationships
+    self.node[StructuredActivityNode]->forEach(structNode) {
+        structNode.node[OpaqueAction]->forEach(action) {
+            var job := result.jobs->select(j | j.name = action.name)->first();
+            var stage := result.stages->select(s | s.name = structNode.name)->first();
+            job.stage := stage;
+        };
+    };
+    
+    // Set job-stage relationships
+    self.node[StructuredActivityNode]->forEach(structNode) {
+        structNode.node[OpaqueAction]->forEach(action) {
+            var job := result.jobs->select(j | j.name = action.name)->first();
+            var stage := result.stages->select(s | s.name = structNode.name)->first();
+            job.stage := stage;
+        };
+    };
+    
+    // Create job dependencies based on control flows
+    self.allSubobjectsOfType(ControlFlow)->forEach(flow) {
+        // Direct job-to-job dependencies
+        var job2jobDependecy = flow.source.oclIsKindOf(OpaqueAction) and flow.target.oclIsKindOf(OpaqueAction);
+        var isJoinNodeControlFlow = flow.source.oclIsKindOf(OpaqueAction) and flow.target.oclIsKindOf(JoinNode);
+        var joinNodeToJob = flow.source.oclIsKindOf(JoinNode) and flow.target.oclIsKindOf(OpaqueAction);
+        var initialNode = flow.source.oclIsKindOf(InitialNode);
+        
+        if (job2jobDependecy) {
+            var sourceJob := result.jobs->select(j | j.name = flow.source.oclAsType(OpaqueAction).name)->first();
+            var targetJob := result.jobs->select(j | j.name = flow.target.oclAsType(OpaqueAction).name)->first();
+            
+            targetJob.depending_on += object Dependency {
+                job := sourceJob;
+            };
+        };
+        
+
+        // Handle flows through join nodes
+        if (isJoinNodeControlFlow) {
+            // Find all outgoing flows from the join node
+            var joinNode := flow.target.oclAsType(JoinNode);
+            var outgoingFlows := self.allSubobjectsOfType(ControlFlow)->select(cf | cf.source = joinNode);
+            
+            // For each outgoing flow that leads to a job, create a dependency
+            outgoingFlows->forEach(outFlow) {
+                if (outFlow.target.oclIsKindOf(OpaqueAction)) {
+                    var sourceJob := result.jobs->select(j | j.name = flow.source.oclAsType(OpaqueAction).name)->first();
+                    var targetJob := result.jobs->select(j | j.name = outFlow.target.oclAsType(OpaqueAction).name)->first();
+                    
+                    targetJob.depending_on += object Dependency {
+                        job := sourceJob;
+                    };
+                };
+            };
+        };
+
+        log("_______________");
+        log("job2jobDependecy " + job2jobDependecy.toString());
+        log("joinNodeToJob " + joinNodeToJob.toString());
+        log("isJoinNodeControlFlow " + isJoinNodeControlFlow.toString());
+        log("_______________");
+        
+        // Handle flows from join nodes to jobs
+        if (joinNodeToJob) {
+            var joinNode := flow.source.oclAsType(JoinNode);
+            var targetJob := result.jobs->select(j | j.name = flow.target.oclAsType(OpaqueAction).name)->first();
+            log(joinNode.toString());
+            log(targetJob.toString());
+            
+            // Find all incoming flows to the join node
+            var incomingFlows := self.allSubobjectsOfType(ControlFlow)->select(cf | cf.target = joinNode);
+            
+            // For each incoming flow that comes from a job, create a dependency
+            incomingFlows->forEach(inFlow) {
+                if (inFlow.source.oclIsKindOf(OpaqueAction)) {
+                    var sourceJob := result.jobs->select(j | j.name = inFlow.source.oclAsType(OpaqueAction).name)->first();
+                    
+                    targetJob.depending_on += object Dependency {
+                        job := sourceJob;
+                    };
+                };
+            };
+        };
+     };
+}
+
+mapping StructuredActivityNode::structuredNode2Stage(): PIM::Stage {
+    name := self.name;
+}
+
+mapping OpaqueAction::action2Job(): PIM::Job {
+	name := self.name;
+}
+
+
+// Helper to check if an action is in a structured node
+query UML::OpaqueAction::inStructuredNode() : Boolean {
+    return self.owner.oclIsKindOf(StructuredActivityNode);
+}
+
+// Helper to safely get name
+helper UML::NamedElement::safeName() : String {
+    return if self.name <> null and self.name <> '' then self.name else 'unnamed' endif;
+}
