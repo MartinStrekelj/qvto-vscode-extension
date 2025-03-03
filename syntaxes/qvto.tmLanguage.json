@@ -36,7 +36,7 @@
     },
     {
       "name": "keyword.control.qvto",
-      "match": "\\b(transformation|query|mapping|helper|modeltype|in|out|inout|when|where|init|end|object|return|var|let|if|then|else|endif|while|with|collect|select|reject|exists|forAll|forEach|import|library|extends|disjuncts|merges|inherits|late|main)\\b"
+      "match": "\\b(transformation|query|mapping|helper|modeltype|in|out|inout|when|where|init|end|object|return|var|let|if|then|else|endif|while|with|collect|select|map|log|first|reject|exists|forAll|forEach|import|library|extends|disjuncts|merges|inherits|late|main)\\b"
     },
     {
       "name": "constant.numeric.qvto",
