@@ -11,3 +11,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## [v0.0.2]
 
 - add first, map and log sytax highlighting
+
+## [v0.0.3]
+
+- add keywords for namespace variables around "::"

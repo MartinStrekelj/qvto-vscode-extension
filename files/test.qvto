@@ -2,13 +2,13 @@ modeltype PIM uses "http://www.example.org/cicd_pim";
 modeltype UML "strict" uses uml('http://www.eclipse.org/uml2/5.0.0/UML');
 
 transformation uml2pim(
-  in umlDiagram: UML, 
+  in umlActivityDiagram: UML, 
   out pimModel: PIM
 );
 
 main() {
     log('Starting to print CICD UML model information');
-    umlDiagram.objects()[Activity]->map activity2Pipeline();
+    umlActivityDiagram.objects()[Activity]->map activity2Pipeline();
     log('Finished printing CICD UML model information');
 }
 
